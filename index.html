@@ -1,545 +1,974 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rehan Khan | Full Stack Developer & AI Specialist</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOHD REHAN | ML Engineering Intern — Cyberpunk Portfolio</title>
+  <meta name="description" content="Mohd Rehan — Machine Learning Engineering Intern, Data Preprocessing specialist, Python Developer. Meta OpenEnv Hackathon 2026 Finalist. Portfolio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #050505;
+      --bg-panel: #111111;
+      --bg-panel-hover: #1a1a1a;
+      --crimson: #ff003c;
+      --crimson-dark: #b80028;
+      --crimson-glow: rgba(255, 0, 60, 0.4);
+      --text-primary: #e0e0e0;
+      --text-dim: #555555;
+      --text-code: #ff003c;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Space Mono", Consolas, monospace;
+      background: var(--bg-void);
+      color: var(--text-primary);
+      overflow: hidden;
+      line-height: 1.65;
+    }
+    h1 { font-family: "Orbitron", sans-serif; font-weight: 900; letter-spacing: 2px; }
+    h2, h3 { font-family: "Rajdhani", sans-serif; font-weight: 700; letter-spacing: 2px; }
+    a { color: inherit; text-decoration: none; }
+    .section { max-width: 1100px; margin: 0 auto; padding: 6rem 1.5rem; }
+    .section-title {
+      font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+      color: var(--crimson);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+    .cyber-panel {
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      background: var(--bg-panel);
+      border: 1px solid rgba(255, 0, 60, 0.3);
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .cyber-panel:hover { background: var(--bg-panel-hover); }
+    .glow-border {
+      box-shadow: 0 0 8px var(--crimson-glow), inset 0 0 4px rgba(255,0,60,0.1);
+      transition: box-shadow 0.3s ease;
+    }
+    .glow-border:hover {
+      box-shadow: 0 0 20px var(--crimson-glow), 0 0 40px rgba(255,0,60,0.2), inset 0 0 8px rgba(255,0,60,0.15);
+    }
+    #scanline-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px);
+    }
+    @keyframes glitch {
+      0%, 100% { clip-path: inset(0); transform: translate(0); }
+      20% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 2px); }
+      40% { clip-path: inset(60% 0 10% 0); transform: translate(3px, -2px); }
+      60% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 1px); }
+      80% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -1px); }
+    }
+    .glitch-text:hover { animation: glitch 0.4s ease; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes prompt-alert { 0%, 100% { color: var(--crimson); } 50% { color: #8f1f37; } }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.05);opacity:1;} }
+    /* Core dial: never animate `transform` here — it must not fight .open scale(1.3) */
+    @keyframes arc-core-glow {
+      0%, 100% { opacity: 1; filter: brightness(1); box-shadow: 0 0 15px var(--crimson-glow), 0 0 28px rgba(255,0,60,.25); }
+      50% { opacity: 0.94; filter: brightness(1.12); box-shadow: 0 0 24px var(--crimson-glow), 0 0 42px rgba(255,0,60,.3); }
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes wave {
+      from { transform: scale(1); opacity: .55; }
+      to { transform: scale(2.15); opacity: 0; }
+    }
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Roboto+Mono:wght@400;700&family=Consolas&display=swap');
+    #terminal-container {
+      position: fixed; inset: 0; z-index: 210; background: #010101;
+      display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+      transition: opacity 0.6s ease;
+    }
+    #terminal { max-width: 760px; width: 100%; color: var(--crimson); font-size: clamp(.8rem, 2.2vw, 1.1rem); }
+    #terminal .line { min-height: 1.4em; }
+    #terminal-prompt { margin-top: 1rem; display: none; animation: prompt-alert 1.2s ease-in-out infinite; }
+    .blink-cursor { animation: blink 0.8s step-end infinite; color: var(--crimson); }
+    #rain-container {
+      position: fixed; inset: 0; background: #000; z-index: 180;
+      opacity: 0; visibility: hidden; transition: opacity 0.35s ease;
+    }
+    #boot-bar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 190;
+      background: var(--crimson); box-shadow: 0 0 14px var(--crimson-glow);
+      transition: width 1s linear;
+      display: none;
+    }
+    #portfolio-wrapper { opacity: 0; visibility: hidden; transition: opacity 0.8s ease; }
+    #bg-canvas { position: fixed; inset: 0; z-index: -1; opacity: .35; }
+    .section-fade { opacity: 0; transform: translateY(32px); transition: transform .7s ease, opacity .7s ease; }
+    .section-fade.visible { opacity: 1; transform: translateY(0); }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0A192F; /* A deep navy blue */
-            color: #E6F1FF; /* A soft off-white */
-            overflow: hidden; /* Hide scrollbars during intro */
-        }
+    #hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+    #hero .label { color: var(--crimson); font-size: .82rem; letter-spacing: 3px; margin-bottom: 1rem; }
+    #hero h1 { font-size: clamp(2.2rem, 7vw, 4.6rem); text-shadow: 0 0 10px var(--crimson-glow); }
+    #hero .subtitle { margin: 1rem 0 1.2rem; color: #a9a9a9; font-size: clamp(.78rem, 2vw, 1rem); }
+    #hero .subtitle span { color: var(--crimson); }
+    #hero .bio { max-width: 740px; color: #9c9c9c; font-size: .9rem; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+    .cta-btn {
+      color: var(--crimson); border: 1px solid var(--crimson); padding: .8rem 1.6rem; font-size: .8rem; letter-spacing: 2px;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      transition: all .3s ease;
+    }
+    .cta-btn:hover { background: var(--crimson); color: #000; box-shadow: 0 0 18px var(--crimson-glow); }
+    .stats-row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; }
+    .stat-block { min-width: 180px; }
+    .stat-num { font-family: "Orbitron", sans-serif; font-size: 2rem; color: var(--crimson); }
+    .stat-label { font-size: .72rem; color: var(--text-dim); text-transform: uppercase; }
 
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3; 
-        }
+    .about-grid, .skills-grid, .projects-grid { display: grid; gap: 2rem; }
+    .about-grid, .skills-grid { grid-template-columns: 1fr 1fr; }
+    .projects-grid { grid-template-columns: 1fr 1fr; }
+    .bio-block { color: #9b9b9b; font-size: .9rem; }
+    .edu-card { padding: 1.5rem; background: rgba(255,0,60,0.04); }
+    .file-header { color: var(--crimson); margin-bottom: .8rem; font-size: .75rem; letter-spacing: 2px; }
+    .field { font-size: .85rem; margin-bottom: .45rem; }
+    .field-label { color: var(--text-dim); }
 
-        .text-glow {
-            text-shadow: 0 0 8px rgba(100, 255, 218, 0.5), 0 0 20px rgba(100, 255, 218, 0.3);
-        }
+    .badges-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+    .badge-card { padding: 1.2rem; position: relative; overflow: hidden; }
+    .badge-card::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 38%, rgba(255,255,255,0.07) 50%, transparent 62%);
+      transform: translateX(-120%);
+      animation: shimmer 3s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes shimmer { to { transform: translateX(120%); } }
+    .badge-card:hover { transform: translateY(-4px); box-shadow: 0 0 20px var(--crimson-glow); }
+    .badge-title { color: var(--crimson); margin-top: .5rem; }
+    .badge-desc { color: var(--text-dim); font-size: .75rem; }
 
-        .cta-button {
-            transition: all 0.3s ease;
-        }
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before { content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: rgba(255,0,60,.35); }
+    .timeline-item { position: relative; margin-bottom: 2.5rem; padding: 1rem 1rem 1rem 1.2rem; border: 1px solid rgba(255,0,60,.2); background: #0f0f0f; }
+    .timeline-item:nth-child(odd) { transform: translateX(-36px); opacity: 0; }
+    .timeline-item:nth-child(even) { transform: translateX(36px); opacity: 0; }
+    .timeline-item.visible { transform: translateX(0); opacity: 1; transition: all .6s ease; }
+    .timeline-dot { position: absolute; left: -2rem; top: 1.2rem; width: 12px; height: 12px; background: var(--crimson); box-shadow: 0 0 10px var(--crimson-glow); animation: pulse 1.8s infinite; }
+    .timeline-date { color: var(--crimson); font-size: .74rem; margin-bottom: .2rem; }
+    .timeline-title { color: #fff; font-size: 1.2rem; }
+    .timeline-org { color: #8e8e8e; font-size: .82rem; margin-bottom: .5rem; }
+    .timeline-desc { color: #9b9b9b; font-size: .86rem; }
 
-        .cta-button:hover {
-            box-shadow: 0 0 20px rgba(100, 255, 218, 0.6);
-            transform: translateY(-3px);
-        }
-        
-        .glassmorphism-card {
-            background: rgba(13, 30, 51, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(45, 212, 191, 0.2);
-            border-radius: 1rem;
-        }
+    .radar-container { max-width: 390px; margin: 0 auto; position: relative; }
+    .radar-sweep {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, rgba(255,0,60,0.15) 30deg, transparent 60deg);
+      animation: radar-sweep 4s linear infinite; pointer-events: none;
+    }
+    .skill-category { color: var(--crimson); margin: .8rem 0 .5rem; font-size: .82rem; letter-spacing: 2px; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .skill-tag { background: #0f0f0f; border-left: 2px solid var(--crimson); padding: .35rem .7rem; font-size: .74rem; }
+    .trajectory-text { color: var(--crimson); margin-top: 1.2rem; animation: pulse 2s infinite; }
 
-        .section-fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
+    .project-card { padding: 1.3rem; }
+    .file-id { color: var(--crimson); font-size: .72rem; letter-spacing: 1px; margin-bottom: .7rem; }
+    .project-card h3 { color: #fff; font-size: 1.2rem; }
+    .project-desc { color: #979797; font-size: .85rem; margin: .7rem 0 1rem; }
+    .tech-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+    .tech-tag { border: 1px solid rgba(255,0,60,.35); color: var(--crimson); font-size: .7rem; padding: .2rem .5rem; }
+    .project-links { display: flex; flex-wrap: wrap; gap: .8rem; }
+    .project-link {
+      border: 1px solid rgba(255,0,60,.5); color: var(--crimson); padding: .42rem .8rem; font-size: .73rem; letter-spacing: 1px;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      transition: all .3s ease;
+    }
+    .project-link:hover { background: var(--crimson); color: #000; box-shadow: 0 0 14px var(--crimson-glow); }
 
-        .section-fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .contact-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: .55rem; color: #ddd; border: 1px solid rgba(255,0,60,.3); padding: .72rem 1rem;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      transition: all .25s ease;
+    }
+    .contact-btn:hover { color: var(--crimson); box-shadow: 0 0 14px rgba(255,0,60,.2); }
+    .contact-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-        .nav-link {
-            position: relative;
-            transition: color 0.3s ease;
-        }
+    footer {
+      margin-top: 2rem; text-align: center; padding: 2rem 1rem;
+      border-top: 1px solid rgba(255,0,60,.2); border-bottom: 1px solid rgba(255,0,60,.2);
+      color: var(--text-dim); font-size: .72rem; letter-spacing: 2px;
+    }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 50%;
-            background-color: #64FFDA;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link:hover {
-            color: #64FFDA;
-        }
+    /* Hub: no translateX(-50%) on parent — avoids subpixel drift + clearer tab origin */
+    #arc-reactor {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .arc-hub {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      flex: 0 0 56px;
+      pointer-events: auto;
+      overflow: visible;
+      /* Do NOT use contain:paint — rings extend past the box and would clip to a square */
+    }
+    #arc-core {
+      box-sizing: border-box;
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
+      min-height: 56px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      margin: 0;
+      border: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background: radial-gradient(circle at 50% 42%, #ff003c 0%, #b80028 72%, #4a0015 100%);
+      box-shadow: 0 0 15px var(--crimson-glow), 0 0 28px rgba(255,0,60,.25);
+      animation: arc-core-glow 1.85s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+      overflow: visible;
+      transition: transform .3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #arc-ring {
+      pointer-events: none;
+      position: absolute; inset: -8px; border-radius: 50%;
+      border: 2px dashed rgba(255,0,60,.55);
+      animation: spin 12s linear infinite;
+      transform-origin: 50% 50%;
+    }
+    #arc-ring-inner {
+      pointer-events: none;
+      position: absolute; inset: -2px; border-radius: 50%;
+      border: 1px solid rgba(255,0,60,.35);
+    }
+    .core-icon { color: #090909; font-size: 1.25rem; z-index: 1; pointer-events: none; }
+    .arc-tab {
+      --angle: 0deg;
+      --delay: 0ms;
+      --orbit: 0px;
+      z-index: 1;
+      pointer-events: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin: 0;
+      /* 0° = straight up; +angle = clockwise — symmetric cardinals */
+      transform: translate(-50%, -50%)
+        translate(
+          calc(var(--orbit) * sin(var(--angle))),
+          calc(-1 * var(--orbit) * cos(var(--angle)))
+        )
+        scale(0.52);
+      min-width: 76px;
+      min-height: 48px;
+      padding: 0.35rem 0.7rem;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(12,12,12,.96); border: 1px solid rgba(255,0,60,.45); color: var(--crimson);
+      font-size: .66rem; letter-spacing: 1px; cursor: pointer;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      opacity: 0;
+      transition: transform .34s cubic-bezier(.34, 1.26, .64, 1), opacity .28s ease;
+      transition-delay: var(--delay);
+      will-change: transform;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #arc-reactor.open .arc-tab {
+      z-index: 5;
+      pointer-events: auto;
+      opacity: 1;
+      transform: translate(-50%, -50%)
+        translate(
+          calc(var(--orbit) * sin(var(--angle))),
+          calc(-1 * var(--orbit) * cos(var(--angle)))
+        )
+        scale(1);
+    }
+    #arc-reactor.open #arc-core { transform: scale(1.3); z-index: 3; }
+    #arc-reactor.open #arc-ring { animation-duration: 6s; }
+    .arc-wave {
+      position: absolute; inset: 0; margin: auto; width: 56px; height: 56px; border-radius: 50%;
+      border: 1px solid rgba(255,0,60,.55); opacity: 0; pointer-events: none;
+      box-sizing: border-box;
+      transform-origin: center center;
+      z-index: 0;
+    }
+    #arc-reactor.open .arc-wave { animation: wave .55s ease-out; }
 
-        .nav-link:hover::after {
-            width: 100%;
-            left: 0;
-        }
+    /* Browsers without trig in transform: fallback to rotate/translate orbit */
+    @supports not (transform: translate(calc(1px * sin(45deg)))) {
+      .arc-tab {
+        transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0.52);
+      }
+      #arc-reactor.open .arc-tab {
+        transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--orbit))) rotate(calc(-1 * var(--angle))) scale(1);
+      }
+    }
 
-        @keyframes spin-slow {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .animate-spin-slow {
-            animation: spin-slow 20s linear infinite;
-        }
+    /* Orbit radius: tabs must stay above the dock (fixed bottom) — never aim into the viewport edge */
+    @media (min-width: 769px) {
+      .arc-tab { --orbit: 100px; }
+    }
 
-        /* --- Intro Screens --- */
-        #terminal-container, #matrix-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100;
-            transition: opacity 0.8s ease-out;
-        }
+    #query-terminal { position: fixed; right: 24px; bottom: 24px; z-index: 60; }
+    #qt-toggle {
+      min-width: 48px; min-height: 48px;
+      border: 1px solid var(--crimson); color: var(--crimson); background: rgba(10,10,10,.95);
+      font-family: "Space Mono", monospace; font-size: .68rem; padding: .5rem .8rem;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      box-shadow: 0 0 12px var(--crimson-glow);
+      animation: pulse 2.1s infinite;
+      cursor: pointer;
+    }
+    #qt-window {
+      width: min(390px, calc(100vw - 24px)); position: absolute; right: 0; bottom: 56px;
+      display: none;
+      background: rgba(10,10,10,.95); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,0,60,.4); box-shadow: 0 0 12px var(--crimson-glow);
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      padding: .9rem;
+    }
+    #qt-window.open { display: block; }
+    #qt-header { color: var(--crimson); font-size: .72rem; letter-spacing: 1px; margin-bottom: .8rem; }
+    #qt-commands { display: grid; gap: .55rem; margin-bottom: .9rem; }
+    .qt-cmd {
+      text-align: left; padding: .55rem .7rem; border: 1px solid rgba(255,0,60,.25); border-left: 3px solid var(--crimson);
+      background: rgba(255,0,60,.04); color: #d6d6d6; font-family: "Space Mono", monospace; font-size: .72rem; cursor: pointer;
+    }
+    .qt-cmd:hover { box-shadow: 0 0 10px rgba(255,0,60,.22); color: var(--crimson); }
+    #qt-output {
+      min-height: 110px; max-height: 180px; overflow-y: auto; padding: .7rem;
+      border: 1px solid rgba(255,0,60,.2);
+      background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0px, rgba(0,0,0,.12) 1px, transparent 1px, transparent 3px),
+        rgba(0,0,0,.45);
+      white-space: pre-wrap; color: #d3d3d3; font-size: .75rem;
+    }
+    .text-crimson { color: var(--text-code); }
+    .text-dim { color: var(--text-dim); }
 
-        /* Terminal Styles */
-        #terminal-container {
-            background-color: #010101; /* CMD Black */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        #terminal {
-            font-family: 'Consolas', 'Roboto Mono', monospace;
-            color: #CCCCCC; /* CMD Gray Text */
-            font-size: 1.2rem;
-            width: 100%;
-            max-width: 800px;
-        }
-        #cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2rem;
-            background-color: #CCCCCC; /* CMD Cursor Color */
-            animation: blink 1s step-end infinite;
-            margin-left: 5px;
-        }
-        @keyframes blink {
-            from, to { background-color: transparent }
-            50% { background-color: #CCCCCC; }
-        }
-
-        /* Matrix Styles */
-        #matrix-container {
-            background-color: #000;
-            opacity: 0;
-            visibility: hidden;
-        }
-        #matrix-canvas {
-            display: block;
-        }
-        
-        /* Portfolio Wrapper Styles */
-        #portfolio-wrapper {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.8s ease-in;
-        }
-
-    </style>
+    @media (max-width: 768px) {
+      #bg-canvas { opacity: .25; }
+      .about-grid, .skills-grid, .projects-grid, .badges-row { grid-template-columns: 1fr; }
+      .section { padding: 4rem 1rem; }
+      #hero h1 { font-size: 2.1rem; }
+      .arc-tab { min-width: 72px; --orbit: 92px; }
+    }
+  </style>
 </head>
-<body class="antialiased">
-    <div id="terminal-container">
-        <div id="terminal">
-            <span id="prompt">C:\Users\Rehan Solutions\portfolio&gt; </span>
-            <span id="typed-text"></span>
-            <span id="cursor"></span>
+<body>
+  <div id="scanline-overlay"></div>
+  <div id="boot-bar"></div>
+
+  <div id="terminal-container">
+    <div id="terminal">
+      <div id="terminal-prompt"></div>
+    </div>
+  </div>
+
+  <div id="rain-container"><canvas id="rain-canvas"></canvas></div>
+
+  <div id="portfolio-wrapper">
+    <canvas id="bg-canvas"></canvas>
+
+    <section id="hero" class="section section-fade">
+      <div class="label">// SYSTEM IDENTIFICATION</div>
+      <h1 class="glitch-text">MOHD REHAN</h1>
+      <div class="subtitle">
+        <span>&gt;</span> Machine Learning Engineering Intern<br>
+        <span>&gt;</span> Data Preprocessing | Python Developer
+      </div>
+      <p class="bio">
+        AI &amp; ML undergraduate focused on building data-driven machine learning models and analytical pipelines. Finalist at Meta OpenEnv Hackathon 2026 and active open-source contributor. Currently leading 1,000+ students as VP at SIT Hyderabad. Highly motivated to learn new technologies and apply supervised learning concepts to solve practical problems.
+      </p>
+      <div class="cta-row">
+        <a href="#projects" class="cta-btn glow-border">VIEW PROJECTS</a>
+        <a href="#about" class="cta-btn glow-border">DOWNLOAD DOSSIER</a>
+      </div>
+      <div class="stats-row">
+        <div class="stat-block"><div class="stat-num" data-target="53000" data-suffix="+">0</div><div class="stat-label">Developers Competed Against</div></div>
+        <div class="stat-block"><div class="stat-num" data-target="1000" data-suffix="+">0</div><div class="stat-label">Students Led as VP</div></div>
+        <div class="stat-block"><div class="stat-num" data-target="5" data-suffix="+">0</div><div class="stat-label">ML Projects Deployed</div></div>
+      </div>
+    </section>
+
+    <section id="about" class="section section-fade">
+      <h2 class="section-title glitch-text">// DOSSIER</h2>
+      <div class="about-grid">
+        <div class="bio-block">
+          <p>AI &amp; ML undergraduate with a strong foundation in Python and data preprocessing. I build structured data pipelines and apply supervised learning to solve practical problems. My approach combines technical execution with active mentorship while serving as Vice President at SIT Hyderabad for a 1,000+ student community.</p>
+          <br>
+          <p>I thrive under pressure and tight deadlines, demonstrated as a Finalist at the Meta OpenEnv Hackathon 2026 among 53,000+ developers globally. Active open-source contributor through GirlScript Summer of Code.</p>
         </div>
+        <div class="edu-card cyber-panel">
+          <div class="file-header">FILE: EDUCATION.DAT // CLASSIFIED</div>
+          <div class="field"><span class="field-label">INSTITUTION:</span> Symbiosis International University</div>
+          <div class="field"><span class="field-label">PROGRAM:</span> B.Tech AI &amp; ML</div>
+          <div class="field"><span class="field-label">CGPA:</span> <span class="text-crimson">7.58</span></div>
+          <div class="field"><span class="field-label">STATUS:</span> ACTIVE [2024-2028]</div>
+          <div class="field"><span class="field-label">COURSEWORK:</span> ML, NLP, Prob &amp; Stats</div>
+        </div>
+      </div>
+      <div class="badges-row">
+        <div class="badge-card cyber-panel">
+          <div style="font-size:1.8rem;">🏆</div>
+          <div class="badge-title">META FINALIST</div>
+          <div class="badge-desc">Meta OpenEnv Hackathon 2026 · Top among 53K+</div>
+        </div>
+        <div class="badge-card cyber-panel">
+          <div style="font-size:1.8rem;">🔓</div>
+          <div class="badge-title">GSSoC'26</div>
+          <div class="badge-desc">Open Source Contributor · ML Projects</div>
+        </div>
+        <div class="badge-card cyber-panel">
+          <div style="font-size:1.8rem;">⚡</div>
+          <div class="badge-title">VP @ SIT</div>
+          <div class="badge-desc">Leading 1,000+ students · Cross-functional teams</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience" class="section section-fade">
+      <h2 class="section-title glitch-text">// EXPERIENCE LOG</h2>
+      <div class="timeline">
+        <div class="timeline-item cyber-panel">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">MAY 2026 — PRESENT</div>
+          <div class="timeline-title">GSSoC'26 Contributor</div>
+          <div class="timeline-org">GirlScript Summer of Code</div>
+          <div class="timeline-desc">Collaborating on ML projects, data analysis, and preprocessing workflows while contributing to repository quality and teamwork execution.</div>
+        </div>
+        <div class="timeline-item cyber-panel">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">NOV 2025 — PRESENT</div>
+          <div class="timeline-title">VP — SIT Hyderabad</div>
+          <div class="timeline-org">Welfare &amp; Engagement</div>
+          <div class="timeline-desc">Leading a 1,000+ member community across mentorship, operations, and cross-functional collaboration under high-pressure timelines.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section section-fade">
+      <h2 class="section-title glitch-text">// THREAT ANALYSIS — SKILLS HUD</h2>
+      <div class="skills-grid">
+        <div class="radar-container">
+          <canvas id="skill-radar"></canvas>
+          <div class="radar-sweep"></div>
+        </div>
+        <div>
+          <div class="skill-category">CORE ML &amp; CONCEPTS</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Scikit-learn</span><span class="skill-tag">Supervised Learning</span><span class="skill-tag">Regression/Classification</span><span class="skill-tag">Prompt Engineering</span>
+          </div>
+          <div class="skill-category">DATA &amp; ANALYTICS</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Data Preprocessing</span><span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span><span class="skill-tag">Matplotlib</span>
+          </div>
+          <div class="skill-category">TOOLS &amp; WEB</div>
+          <div class="skill-tags">
+            <span class="skill-tag">FastAPI</span><span class="skill-tag">React</span><span class="skill-tag">PostgreSQL</span><span class="skill-tag">Git/GitHub</span>
+          </div>
+          <div class="trajectory-text">&gt; TRAJECTORY: EXPONENTIAL ↑ // ALL SYSTEMS NOMINAL</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section section-fade">
+      <h2 class="section-title glitch-text">// PROJECTS ARCHIVE — REDACTED FILES</h2>
+      <div class="projects-grid">
+        <div class="project-card cyber-panel">
+          <div class="file-id">FILE-001 // CLASSIFICATION: CRIMSON</div>
+          <h3>SwiftLogic CommerceOps v2</h3>
+          <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">Scikit-learn</span><span class="tech-tag">Pandas</span></div>
+          <p class="project-desc">Meta OpenEnv Hackathon 2026 Finalist. Built structured preprocessing pipelines for dynamic e-commerce analysis.</p>
+          <div class="project-links">
+            <a class="project-link glow-border" href="https://github.com/Rehan-2024/Swiftlogic-Ecom-Agent" target="_blank" rel="noopener noreferrer">⟐ REPO</a>
+            <a class="project-link glow-border" href="https://huggingface.co/spaces/Swiftlogic/E-commerce-agent" target="_blank" rel="noopener noreferrer">◈ LIVE APP</a>
+          </div>
+        </div>
+        <div class="project-card cyber-panel">
+          <div class="file-id">FILE-002 // CLASSIFICATION: CRIMSON</div>
+          <h3>SwiftPath — Biomedical Data Pipeline</h3>
+          <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">NLP</span><span class="tech-tag">Vector DBs</span></div>
+          <p class="project-desc">Biomedical data retrieval and NLP processing pipeline with robust preprocessing for downstream model reliability.</p>
+          <div class="project-links">
+            <a class="project-link glow-border" href="https://github.com/Rehan-2024/swiftpath" target="_blank" rel="noopener noreferrer">⟐ REPO</a>
+          </div>
+        </div>
+        <div class="project-card cyber-panel">
+          <div class="file-id">FILE-003 // CLASSIFICATION: CRIMSON</div>
+          <h3>Ayusutra — Healthcare Recommendation</h3>
+          <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">Scikit-learn</span><span class="tech-tag">FastAPI</span></div>
+          <p class="project-desc">Healthcare recommendation system with scalable FastAPI backend and symptom-based analytical routing.</p>
+          <div class="project-links">
+            <a class="project-link glow-border" href="https://github.com/Rehan-2024/TEAM-ICEBERG-SIH2025-ayusutra-SIH" target="_blank" rel="noopener noreferrer">⟐ REPO</a>
+          </div>
+        </div>
+        <div class="project-card cyber-panel">
+          <div class="file-id">FILE-004 // CLASSIFICATION: CRIMSON</div>
+          <h3>CRM &amp; POS Analytics Dashboard</h3>
+          <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">PostgreSQL</span><span class="tech-tag">React</span></div>
+          <p class="project-desc">Full-stack analytics dashboard for CRM and POS data with structured business intelligence outputs.</p>
+          <div class="project-links">
+            <a class="project-link glow-border" href="https://siyaani-db-suite.vercel.app/" target="_blank" rel="noopener noreferrer">◈ LIVE APP</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section section-fade">
+      <h2 class="section-title glitch-text">&gt; ESTABLISH SECURE UPLINK</h2>
+      <p style="text-align:center; color:var(--text-dim); margin-bottom:1.4rem;">&gt; ALL CHANNELS ACTIVE</p>
+      <div class="contact-grid">
+        <a href="mailto:krehankhan884@gmail.com" class="contact-btn glow-border">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>EMAIL
+        </a>
+        <a href="tel:+916267373212" class="contact-btn glow-border">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>PHONE
+        </a>
+        <a href="https://linkedin.com/in/mohdrehan-924a23326" target="_blank" rel="noopener noreferrer" class="contact-btn glow-border">LINKEDIN</a>
+        <a href="https://github.com/Rehan-2024" target="_blank" rel="noopener noreferrer" class="contact-btn glow-border">GITHUB</a>
+        <a href="https://www.instagram.com/rehankhan_861/" target="_blank" rel="noopener noreferrer" class="contact-btn glow-border">INSTAGRAM</a>
+      </div>
+    </section>
+
+    <footer>
+      DESIGNED &amp; DEPLOYED BY MOHD REHAN // 2026<br>
+      <span style="color:var(--crimson)">&gt; ALL SYSTEMS NOMINAL</span>
+    </footer>
+  </div>
+
+  <div id="arc-reactor">
+    <div class="arc-hub">
+      <!-- Dial is bottom-fixed: SW/SE math (135°/225°) shoved tabs off-screen. Fan only through top half (|angle| &lt; 90°). -->
+      <div class="arc-tab" style="--angle:-48deg;--delay:0ms;" role="button" tabindex="0" data-target="#about">ABOUT</div>
+      <div class="arc-tab" style="--angle:48deg;--delay:50ms;" role="button" tabindex="0" data-target="#skills">SKILLS</div>
+      <div class="arc-tab" style="--angle:-82deg;--delay:100ms;" role="button" tabindex="0" data-target="#projects">PROJECTS</div>
+      <div class="arc-tab" style="--angle:82deg;--delay:150ms;" role="button" tabindex="0" data-target="#contact">CONTACT</div>
+      <div class="arc-wave" aria-hidden="true"></div>
+      <button type="button" id="arc-core" aria-expanded="false" aria-label="Open navigation dial">
+        <div id="arc-ring"></div>
+        <div id="arc-ring-inner"></div>
+        <span class="core-icon" aria-hidden="true">⬡</span>
+      </button>
     </div>
+  </div>
 
-    <div id="matrix-container">
-        <canvas id="matrix-canvas"></canvas>
+  <div id="query-terminal">
+    <button id="qt-toggle">&gt; SYSTEM_CORE</button>
+    <div id="qt-window">
+      <div id="qt-header">MAINFRAME QUERY TERMINAL v3.1</div>
+      <div id="qt-commands">
+        <button class="qt-cmd" data-query="status">./query_current_status.sh</button>
+        <button class="qt-cmd" data-query="competencies">./query_core_competencies.sh</button>
+        <button class="qt-cmd" data-query="ethic">./query_work_ethic.sh</button>
+      </div>
+      <div id="qt-output">&gt; Awaiting query...<span class="blink-cursor">_</span></div>
     </div>
-    
-    <div id="portfolio-wrapper">
-        <canvas id="bg-canvas"></canvas>
+  </div>
 
-        <!-- Header -->
-        <header class="fixed top-0 left-0 right-0 z-10 bg-slate-900/80 backdrop-blur-sm shadow-md">
-            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#" class="text-xl font-bold text-white flex items-center gap-3">
-                    <!-- UPDATED R. LOGO -->
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-cyan-400">
-                        <text x="5" y="28" font-family="'Roboto Mono', monospace" font-size="24" font-weight="bold" fill="currentColor">R.</text>
-                    </svg>
-                    <span class="text-glow font-mono text-2xl">&lt;Rehan Solutions&gt;;</span>
-                </a>
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#about" class="nav-link text-gray-300">About</a>
-                    <a href="#projects" class="nav-link text-gray-300">Projects</a>
-                    <a href="#contact" class="nav-link text-gray-300">Contact</a>
-                </div>
-            </nav>
-        </header>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    (function configModule() {
+      window.CYBER_CONFIG = {
+        isMobile: window.innerWidth <= 768,
+        particleCount: window.innerWidth <= 768 ? 70 : 150,
+        particleSize: window.innerWidth <= 768 ? 0.4 : 0.3,
+        lineOpacity: window.innerWidth <= 768 ? 0.12 : 0.15,
+        maxLineDistance: window.innerWidth <= 768 ? 10 : 12,
+        canvasOpacity: window.innerWidth <= 768 ? 0.25 : 0.35,
+        gravityRadius: 25,
+        gravityStrength: 0.08,
+        typeSpeed: 40,
+        lineDelay: 400
+      };
+    })();
 
-        <main class="container mx-auto px-6">
-            <!-- Hero Section -->
-            <section class="min-h-screen flex flex-col justify-center text-left section-fade-in">
-                <p class="text-cyan-400 font-mono text-lg mb-4">Hi, my name is</p>
-                <h1 class="text-5xl md:text-7xl font-black text-white mb-4 text-glow">
-                    Rehan Khan.
-                </h1>
-                <h2 class="text-4xl md:text-6xl font-bold text-gray-400 mb-8">
-                    I build for the web & beyond.
-                </h2>
-                <p class="max-w-xl text-lg text-gray-400 mb-12">
-                    I'm a full-stack developer specializing in creating dynamic web applications and integrating intelligent AI solutions. Currently pursuing a B.Tech in AI & ML from Symbiosis International University.
-                </p>
-                <a href="#projects" class="cta-button inline-block w-fit px-12 py-5 bg-transparent border-2 border-cyan-400 text-cyan-400 font-semibold rounded-lg hover:bg-cyan-400 hover:text-slate-900">
-                    View My Work
-                </a>
-            </section>
+    (function terminalIntroModule() {
+      const LINES = [
+        "> INITIALIZING NEURAL LINK...",
+        "> BREACHING FIREWALL [████████░░] 82%",
+        "> WARNING: UNAUTHORIZED ACCESS DETECTED",
+        "> COUNTERMEASURES BYPASSED",
+        "> ACCESS GRANTED — MAINFRAME UNLOCKED"
+      ];
+      const FINAL_PROMPT = "> SYSTEM LOCK. PRESS ENTER OR TAP SCREEN TO OVERRIDE_";
+      let ready = false;
+      let started = false;
 
-            <!-- About Me Section -->
-            <section id="about" class="py-24 flex flex-col md:flex-row items-center gap-16 section-fade-in">
-                <div class="md:w-2/3">
-                    <h2 class="text-4xl font-bold text-white mb-8 text-glow relative inline-block">
-                        About Me
-                        <span class="absolute -bottom-2 left-0 w-2/3 h-1 bg-cyan-400"></span>
-                    </h2>
-                    <div class="text-gray-300 text-lg space-y-4">
-                        <p>
-                            Hello! I'm Rehan, a developer with a passion for turning ideas into reality. My journey into tech is fueled by my studies at Symbiosis International University, where I'm specializing in AI & Machine Learning. This academic foundation provides me with a deep understanding of cutting-edge technologies.
-                        </p>
-                        <p>
-                            I have practical experience working with businesses to build their online presence from the ground up. I thrive on solving complex problems and delivering clean, efficient, and user-friendly digital solutions.
-                        </p>
-                        <p>Here are a few technologies I've been working with recently:</p>
-                    </div>
-                    <ul class="grid grid-cols-2 gap-x-8 gap-y-2 mt-6 font-mono text-gray-400">
-                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-4 h-4 text-cyan-400"></i>JavaScript (ES6+)</li>
-                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-4 h-4 text-cyan-400"></i>React & Next.js</li>
-                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-4 h-4 text-cyan-400"></i>Node.js</li>
-                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-4 h-4 text-cyan-400"></i>Python</li>
-                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-4 h-4 text-cyan-400"></i>AI API Integration</li>
-                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-4 h-4 text-cyan-400"></i>Tailwind CSS</li>
-                    </ul>
-                </div>
-                 <div class="md:w-1/3 flex justify-center items-center">
-                    <div class="w-64 h-64 rounded-full bg-cyan-400/10 flex items-center justify-center p-2 relative group">
-                         <div class="absolute inset-0 border-2 border-cyan-400 rounded-full animate-spin-slow"></div>
-                         <div class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center">
-                            <!-- UPDATED R. LOGO in About Section -->
-                            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-cyan-400 group-hover:scale-110 transition-transform duration-300">
-                                <text x="20" y="75" font-family="'Roboto Mono', monospace" font-size="72" font-weight="bold" fill="currentColor">R.</text>
-                            </svg>
-                         </div>
-                    </div>
-                </div>
-            </section>
+      const typeText = async function(text, element) {
+        for (let i = 0; i < text.length; i++) {
+          element.textContent += text[i];
+          await new Promise(function(r) { setTimeout(r, window.CYBER_CONFIG.typeSpeed); });
+        }
+      };
 
-            <!-- Featured Projects Section -->
-            <section id="projects" class="py-24 section-fade-in">
-                <h2 class="text-4xl font-bold text-center mb-16 text-white text-glow">
-                    Featured Projects
-                </h2>
-                <div class="space-y-16">
-                    <!-- Project 1 -->
-                    <div class="max-w-3xl mx-auto">
-                        <div class="text-left">
-                            <p class="font-mono text-cyan-400 mb-2">Business Website</p>
-                            <h3 class="text-3xl font-bold text-white mb-4">Siyaani.in</h3>
-                            <div class="glassmorphism-card p-6 my-4 text-left">
-                                <p class="text-gray-300">Developed a professional and elegant website for a business, focusing on a clean user interface, brand representation, and responsive design to ensure a seamless experience across all devices.</p>
-                            </div>
-                            <ul class="flex gap-4 font-mono text-gray-400 justify-start flex-wrap">
-                                <li>React</li>
-                                <li>Tailwind CSS</li>
-                                <li>Node.js</li>
-                            </ul>
-                             <a href="http://siyaani.in" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 hover:text-cyan-400 transition-colors">
-                                <i data-lucide="arrow-up-right-square" class="w-8 h-8"></i>
-                            </a>
-                        </div>
-                    </div>
+      const showDataRain = function() {
+        const rainContainer = document.getElementById("rain-container");
+        const canvas = document.getElementById("rain-canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        rainContainer.style.visibility = "visible";
+        rainContainer.style.opacity = "1";
+        const chars = "アァカサタナハマヤャラワABCDEF0123456789";
+        const size = 14;
+        const cols = Math.floor(canvas.width / size);
+        const drops = new Array(cols).fill(1);
+        const rainInterval = setInterval(function() {
+          ctx.fillStyle = "rgba(0,0,0,0.08)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#FF003C";
+          ctx.font = size + "px monospace";
+          for (let i = 0; i < drops.length; i++) {
+            const ch = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(ch, i * size, drops[i] * size);
+            if (drops[i] * size > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+          }
+        }, 30);
 
-                    <!-- Project 2 -->
-                    <div class="max-w-3xl mx-auto">
-                         <div class="text-left">
-                            <p class="font-mono text-cyan-400 mb-2">Govt. Project (Hackathon)</p>
-                            <h3 class="text-3xl font-bold text-white mb-4">Ministry of Ayush (SIH Project)</h3>
-                            <div class="glassmorphism-card p-6 my-4">
-                                <p class="text-gray-300">Developed a comprehensive platform for the Ministry of Ayush as part of the Smart India Hackathon (SIH). The project focused on creating an accessible and informative digital resource for wellness.</p>
-                            </div>
-                            <ul class="flex gap-4 font-mono text-gray-400 flex-wrap">
-                                <li>Next.js</li>
-                                <li>Sanity CMS</li>
-                                <li>Vercel</li>
-                            </ul>
-                             <a href="https://github.com/Rehan-2024/TEAM-ICEBERG-SIH2025-ayusutra-SIH" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 hover:text-cyan-400 transition-colors">
-                                <i data-lucide="github" class="w-8 h-8"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        setTimeout(function() {
+          rainContainer.style.opacity = "0";
+          const bar = document.getElementById("boot-bar");
+          bar.style.display = "block";
+          requestAnimationFrame(function() { bar.style.width = "100%"; });
 
-            <!-- Testimonials Section -->
-            <section id="testimonials" class="py-24 section-fade-in">
-                <h2 class="text-4xl font-bold text-center mb-16 text-white text-glow">
-                    Client Feedback
-                </h2>
-                <div class="max-w-3xl mx-auto text-center glassmorphism-card p-8 md:p-12">
-                     <i data-lucide="quote" class="w-12 h-12 text-cyan-400 mx-auto mb-4"></i>
-                    <p class="text-xl md:text-2xl italic text-gray-300 mb-6">"Rehan is a sharp and dedicated developer. He understood our vision perfectly and delivered a high-quality website that exceeded our expectations. His ability to solve problems and communicate clearly makes him a true partner in any project."</p>
-                    <p class="font-bold text-white">- Founder, Siyaani.in</p>
-                </div>
-            </section>
+          setTimeout(function() {
+            clearInterval(rainInterval);
+            rainContainer.style.display = "none";
+            bar.style.display = "none";
+            const wrapper = document.getElementById("portfolio-wrapper");
+            wrapper.style.visibility = "visible";
+            wrapper.style.opacity = "1";
+            document.body.style.overflow = "auto";
+            window.initPortfolio();
+          }, 1000);
+        }, 2500);
+      };
 
-            <!-- Contact Section -->
-            <section id="contact" class="py-24 text-center section-fade-in">
-                <p class="font-mono text-cyan-400 mb-4">What's Next?</p>
-                <h2 class="text-5xl font-bold text-white mb-6 text-glow">Get In Touch</h2>
-                <p class="max-w-xl mx-auto text-lg text-gray-400 mb-8">
-                    I'm always open to discussing new projects, creative ideas, or opportunities to be part of an amazing team. Whether you have a question or just want to say hi, my inbox is always open!
-                </p>
-                <a href="mailto:krehankhan884@gmail.com" class="cta-button inline-block px-12 py-5 bg-transparent border-2 border-cyan-400 text-cyan-400 font-semibold rounded-lg hover:bg-cyan-400 hover:text-slate-900">
-                    Say Hello
-                </a>
-            </section>
-        </main>
+      window.initTerminalIntro = async function() {
+        const container = document.getElementById("terminal-container");
+        const terminal = document.getElementById("terminal");
+        const prompt = document.getElementById("terminal-prompt");
 
-        <!-- Footer -->
-        <footer class="py-8">
-            <div class="container mx-auto px-6 flex flex-col items-center justify-center gap-4">
-                <div class="flex space-x-6">
-                     <a href="https://github.com/Rehan-2024/TEAM-ICEBERG-SIH2025-ayusutra-SIH" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-cyan-400 transition-colors">
-                        <i data-lucide="github" class="w-6 h-6"></i>
-                    </a>
-                    <a href="https://www.instagram.com/rehankhan_861/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-cyan-400 transition-colors">
-                        <i data-lucide="instagram" class="w-6 h-6"></i>
-                    </a>
-                </div>
-                <p class="font-mono text-xs text-gray-500">
-                    Designed & Built by Rehan Khan
-                </p>
-            </div>
-        </footer>
-    </div>
+        for (let i = 0; i < LINES.length; i++) {
+          const line = document.createElement("div");
+          line.className = "line";
+          terminal.insertBefore(line, prompt);
+          await typeText(LINES[i], line);
+          await new Promise(function(r) { setTimeout(r, window.CYBER_CONFIG.lineDelay); });
+        }
 
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const terminalContainer = document.getElementById('terminal-container');
-            const matrixContainer = document.getElementById('matrix-container');
-            const portfolioWrapper = document.getElementById('portfolio-wrapper');
-            const typedTextSpan = document.getElementById('typed-text');
-            const textToType = "run portfolio";
-            let isTypingComplete = false;
-            
-            function type() {
-                let i = 0;
-                function typeChar() {
-                    if (i < textToType.length) {
-                        typedTextSpan.textContent += textToType.charAt(i);
-                        i++;
-                        setTimeout(typeChar, 150);
-                    } else {
-                        isTypingComplete = true;
-                    }
-                }
-                typeChar();
-            }
+        prompt.innerHTML = FINAL_PROMPT.replace("_", '<span class="blink-cursor">_</span>');
+        prompt.style.display = "block";
+        ready = true;
 
-            function startPortfolio() {
-                terminalContainer.style.opacity = '0';
+        const startPortfolio = function() {
+          if (!ready || started) return;
+          started = true;
+          container.style.opacity = "0";
+          setTimeout(function() {
+            container.style.display = "none";
+            showDataRain();
+          }, 600);
+        };
+        document.addEventListener("keydown", function(e) { if (e.key === "Enter" && ready) startPortfolio(); });
+        container.addEventListener("click", function() { if (ready) startPortfolio(); });
+        container.addEventListener("touchstart", function() { if (ready) startPortfolio(); }, { passive: true });
+      };
+    })();
 
-                setTimeout(() => {
-                    terminalContainer.style.display = 'none';
-                    matrixContainer.style.visibility = 'visible';
-                    matrixContainer.style.opacity = '1';
-                    initializeMatrix();
-                }, 800);
-
-                setTimeout(() => {
-                    matrixContainer.style.opacity = '0';
-                    portfolioWrapper.style.visibility = 'visible';
-                    portfolioWrapper.style.opacity = '1';
-                    document.body.style.overflow = 'auto';
-                    initializePortfolioScripts();
-                }, 4000); // Show matrix for ~3 seconds
-
-                setTimeout(() => {
-                    matrixContainer.style.display = 'none';
-                }, 4800);
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && isTypingComplete) {
-                    startPortfolio();
-                }
-            });
-
-            type(); // Start the typing animation
-            
-            function initializeMatrix() {
-                const canvas = document.getElementById('matrix-canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-
-                const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
-                const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                const nums = '0123456789';
-                const alphabet = katakana + latin + nums;
-                const fontSize = 16;
-                const columns = canvas.width / fontSize;
-                const rainDrops = [];
-
-                for (let x = 0; x < columns; x++) {
-                    rainDrops[x] = 1;
-                }
-
-                const draw = () => {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#0F0'; // Green text
-                    ctx.font = fontSize + 'px monospace';
-
-                    for (let i = 0; i < rainDrops.length; i++) {
-                        const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                        ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-                        if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                            rainDrops[i] = 0;
-                        }
-                        rainDrops[i]++;
-                    }
-                };
-                const matrixInterval = setInterval(draw, 30);
-                 window.addEventListener('resize', () => {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                });
-                // Stop the matrix animation after the portfolio is fully visible
-                setTimeout(() => clearInterval(matrixInterval), 5000);
-            }
-
-            function initializePortfolioScripts() {
-                // Lucide Icons
-                lucide.createIcons();
-
-                // --- 3D Background Animation ---
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                const renderer = new THREE.WebGLRenderer({
-                    canvas: document.querySelector('#bg-canvas'),
-                    alpha: true
-                });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                
-                camera.position.z = 50;
-
-                const particles = [];
-                const particleCount = 200;
-                const maxDistance = 10;
-                
-                const particleGeometry = new THREE.BufferGeometry();
-                const particleMaterial = new THREE.PointsMaterial({ color: 0x64FFDA, size: 0.3 });
-                const lineMaterial = new THREE.LineBasicMaterial({ color: 0x64FFDA, transparent: true, opacity: 0.2 });
-
-                for (let i = 0; i < particleCount; i++) {
-                    const particle = new THREE.Vector3(
-                        (Math.random() - 0.5) * 100,
-                        (Math.random() - 0.5) * 100,
-                        (Math.random() - 0.5) * 100
-                    );
-                    particle.velocity = new THREE.Vector3(
-                        (Math.random() - 0.5) * 0.1,
-                        (Math.random() - 0.5) * 0.1,
-                        (Math.random() - 0.5) * 0.1
-                    );
-                    particles.push(particle);
-                }
-
-                particleGeometry.setFromPoints(particles);
-                const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
-                scene.add(particleSystem);
-                
-                const lineGeometry = new THREE.BufferGeometry();
-                const lineMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
-                scene.add(lineMesh);
-                
-                const mouse = new THREE.Vector2();
-                window.addEventListener('mousemove', (event) => {
-                    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-                });
-                
-                function animate() {
-                    requestAnimationFrame(animate);
-
-                    const positions = particleSystem.geometry.attributes.position.array;
-                    const linePositions = [];
-
-                    for (let i = 0; i < particleCount; i++) {
-                        const particle = particles[i];
-                        particle.add(particle.velocity);
-
-                        if (particle.x < -50 || particle.x > 50) particle.velocity.x *= -1;
-                        if (particle.y < -50 || particle.y > 50) particle.velocity.y *= -1;
-                        if (particle.z < -50 || particle.z > 50) particle.velocity.z *= -1;
-
-                        positions[i * 3] = particle.x;
-                        positions[i * 3 + 1] = particle.y;
-                        positions[i * 3 + 2] = particle.z;
-                        
-                        for (let j = i + 1; j < particleCount; j++) {
-                            const otherParticle = particles[j];
-                            const distance = particle.distanceTo(otherParticle);
-                            if (distance < maxDistance) {
-                                linePositions.push(particle.x, particle.y, particle.z);
-                                linePositions.push(otherParticle.x, otherParticle.y, otherParticle.z);
-                            }
-                        }
-                    }
-                    
-                    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-                    particleSystem.geometry.attributes.position.needsUpdate = true;
-                    
-                    // Mouse interaction for camera
-                    camera.position.x += (mouse.x * 5 - camera.position.x) * 0.02;
-                    camera.position.y += (mouse.y * 5 - camera.position.y) * 0.02;
-                    camera.lookAt(scene.position);
-
-                    renderer.render(scene, camera);
-                }
-                animate();
-
-                window.addEventListener('resize', () => {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-
-                // Scroll Fade-in Animation
-                const sections = document.querySelectorAll('.section-fade-in');
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                        }
-                    });
-                }, { threshold: 0.1 });
-
-                sections.forEach(section => {
-                    observer.observe(section);
-                });
-            }
+    (function arcReactorModule() {
+      function setOpen(reactor, core, isOpen) {
+        reactor.classList.toggle("open", isOpen);
+        if (core) core.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
+      window.initArcReactor = function() {
+        const reactor = document.getElementById("arc-reactor");
+        const core = document.getElementById("arc-core");
+        var open = false;
+        if (!reactor || !core) return;
+        core.addEventListener("click", function(e) {
+          e.stopPropagation();
+          open = !open;
+          setOpen(reactor, core, open);
         });
-    </script>
+        document.querySelectorAll(".arc-tab").forEach(function(tab) {
+          function goTarget() {
+            var target = document.querySelector(tab.getAttribute("data-target"));
+            if (target) target.scrollIntoView({ behavior: "smooth" });
+            open = false;
+            setOpen(reactor, core, false);
+          }
+          tab.addEventListener("click", function(e) {
+            e.stopPropagation();
+            goTarget();
+          });
+          tab.addEventListener("keydown", function(e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              goTarget();
+            }
+          });
+        });
+        document.addEventListener("click", function() {
+          if (open) {
+            open = false;
+            setOpen(reactor, core, false);
+          }
+        });
+      };
+    })();
+
+    (function threeModule() {
+      window.initThreeScene = function() {
+        const canvas = document.getElementById("bg-canvas");
+        canvas.style.opacity = window.CYBER_CONFIG.canvasOpacity;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        camera.position.z = 50;
+
+        const count = window.CYBER_CONFIG.particleCount;
+        const particles = [];
+        const geo = new THREE.BufferGeometry();
+        const pMat = new THREE.PointsMaterial({ color: 0xff003c, size: window.CYBER_CONFIG.particleSize });
+        const lMat = new THREE.LineBasicMaterial({ color: 0xff003c, transparent: true, opacity: window.CYBER_CONFIG.lineOpacity });
+        for (let i = 0; i < count; i++) {
+          const p = new THREE.Vector3((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 50);
+          p.vel = new THREE.Vector3((Math.random() - 0.5) * 0.08, (Math.random() - 0.5) * 0.08, (Math.random() - 0.5) * 0.04);
+          particles.push(p);
+        }
+        geo.setFromPoints(particles);
+        const points = new THREE.Points(geo, pMat);
+        scene.add(points);
+        const lineGeo = new THREE.BufferGeometry();
+        const lines = new THREE.LineSegments(lineGeo, lMat);
+        scene.add(lines);
+        const mouse = { x: 0, y: 0, active: false };
+        const setPointer = function(clientX, clientY) {
+          mouse.x = (clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+          mouse.active = true;
+        };
+        window.addEventListener("mousemove", function(e) { setPointer(e.clientX, e.clientY); });
+        window.addEventListener("touchmove", function(e) {
+          if (e.touches && e.touches[0]) setPointer(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        const animate = function() {
+          requestAnimationFrame(animate);
+          const positions = points.geometry.attributes.position.array;
+          const linePos = [];
+          const mouseWorld = new THREE.Vector3(mouse.x * 50, mouse.y * 50, 0);
+          for (let i = 0; i < count; i++) {
+            const p = particles[i];
+            if (mouse.active) {
+              const dist = p.distanceTo(mouseWorld);
+              if (dist < window.CYBER_CONFIG.gravityRadius) {
+                const force = (1 - dist / window.CYBER_CONFIG.gravityRadius) * window.CYBER_CONFIG.gravityStrength;
+                const dir = mouseWorld.clone().sub(p).normalize().multiplyScalar(force);
+                p.vel.add(dir);
+              }
+            }
+            p.vel.multiplyScalar(0.98);
+            p.add(p.vel);
+            if (p.x < -50 || p.x > 50) p.vel.x *= -1;
+            if (p.y < -50 || p.y > 50) p.vel.y *= -1;
+            if (p.z < -25 || p.z > 25) p.vel.z *= -1;
+            positions[i * 3] = p.x;
+            positions[i * 3 + 1] = p.y;
+            positions[i * 3 + 2] = p.z;
+            for (let j = i + 1; j < count; j++) {
+              const o = particles[j];
+              if (p.distanceTo(o) < window.CYBER_CONFIG.maxLineDistance) {
+                linePos.push(p.x, p.y, p.z, o.x, o.y, o.z);
+              }
+            }
+          }
+          lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(linePos, 3));
+          points.geometry.attributes.position.needsUpdate = true;
+          camera.position.x += (mouse.x * 3 - camera.position.x) * 0.01;
+          camera.position.y += (mouse.y * 3 - camera.position.y) * 0.01;
+          camera.lookAt(scene.position);
+          renderer.render(scene, camera);
+        };
+        animate();
+        window.addEventListener("resize", function() {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      };
+    })();
+
+    (function chartModule() {
+      window.initRadar = function() {
+        const canvas = document.getElementById("skill-radar");
+        if (!canvas || canvas.dataset.ready === "1") return;
+        canvas.dataset.ready = "1";
+        const ctx = canvas.getContext("2d");
+        new Chart(ctx, {
+          type: "radar",
+          data: {
+            labels: ["Python", "Scikit-learn", "Data Preprocessing", "Prompt Engineering", "Pandas/NumPy", "FastAPI/React"],
+            datasets: [{
+              label: "THREAT LEVEL",
+              data: [90, 78, 85, 72, 82, 68],
+              borderColor: "#FF003C",
+              backgroundColor: "rgba(255, 0, 60, 0.12)",
+              borderWidth: 2,
+              pointBackgroundColor: "#FF003C",
+              pointBorderColor: "#FF003C",
+              pointRadius: 5,
+              pointHoverRadius: 8
+            }]
+          },
+          options: {
+            scales: {
+              r: {
+                grid: { color: "rgba(255,255,255,0.08)" },
+                angleLines: { color: "rgba(255,255,255,0.08)" },
+                pointLabels: { color: "#E0E0E0", font: { family: "Space Mono", size: 11 } },
+                ticks: { display: false },
+                suggestedMin: 0,
+                suggestedMax: 100
+              }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      };
+    })();
+
+    (function queryTerminalModule() {
+      const QUERIES = {
+        status: {
+          command: "> QUERY: CURRENT_STATUS",
+          output: "STATUS: Active. Currently pursuing B.Tech in AI/ML at SIT Hyderabad. Actively seeking Machine Learning Engineering Internship opportunities to deploy data-driven solutions."
+        },
+        competencies: {
+          command: "> QUERY: CORE_COMPETENCIES",
+          output: "ANALYSIS COMPLETE. Primary strengths identified: Python, Scikit-learn, Data Preprocessing, and Analytical Pipeline architecture. High adaptability to new frameworks detected."
+        },
+        ethic: {
+          command: "> QUERY: WORK_ETHIC",
+          output: "LOG RETRIEVED: Demonstrated capability to lead 1,000+ member communities and execute under pressure (Meta OpenEnv Hackathon 2026 Finalist). Highly trainable. No critical errors found."
+        }
+      };
+      let currentTimeout = null;
+      let currentInterval = null;
+      window.initQueryTerminal = function() {
+        const toggle = document.getElementById("qt-toggle");
+        const panel = document.getElementById("qt-window");
+        const output = document.getElementById("qt-output");
+        toggle.addEventListener("click", function() { panel.classList.toggle("open"); });
+        document.querySelectorAll(".qt-cmd").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            const query = QUERIES[btn.dataset.query];
+            if (!query) return;
+            clearTimeout(currentTimeout);
+            clearInterval(currentInterval);
+            output.innerHTML = "<span class='text-crimson'>" + query.command + "</span>\n\n";
+            let i = 0;
+            const text = query.output;
+            currentTimeout = setTimeout(function() {
+              currentInterval = setInterval(function() {
+                if (i < text.length) {
+                  output.innerHTML = "<span class='text-crimson'>" + query.command + "</span>\n\n" + text.substring(0, i + 1) + "<span class='blink-cursor'>_</span>";
+                  i++;
+                } else {
+                  clearInterval(currentInterval);
+                  output.innerHTML = "<span class='text-crimson'>" + query.command + "</span>\n\n" + text + "\n\n<span class='text-dim'>> QUERY COMPLETE. AWAITING NEXT INSTRUCTION..._</span>";
+                }
+                output.scrollTop = output.scrollHeight;
+              }, 25);
+            }, 300);
+          });
+        });
+      };
+    })();
+
+    (function scrollFxModule() {
+      window.initScrollFx = function() {
+        const sectionObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) entry.target.classList.add("visible");
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll(".section-fade").forEach(function(el) { sectionObserver.observe(el); });
+
+        const timelineObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add("visible"); });
+        }, { threshold: 0.2 });
+        document.querySelectorAll(".timeline-item").forEach(function(item) { timelineObserver.observe(item); });
+
+        let counted = false;
+        const statObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (!entry.isIntersecting || counted) return;
+            counted = true;
+            document.querySelectorAll(".stat-num").forEach(function(el) {
+              const target = parseInt(el.dataset.target || "0", 10);
+              const suffix = el.dataset.suffix || "";
+              const duration = 2000;
+              const start = performance.now();
+              const animate = function(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const value = Math.floor(progress * target);
+                el.textContent = value.toLocaleString() + suffix;
+                if (progress < 1) requestAnimationFrame(animate);
+              };
+              requestAnimationFrame(animate);
+            });
+          });
+        }, { threshold: 0.3 });
+        const statRow = document.querySelector(".stats-row");
+        if (statRow) statObserver.observe(statRow);
+
+        const radarObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              window.initRadar();
+              radarObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.22 });
+        const skillSection = document.getElementById("skills");
+        if (skillSection) radarObserver.observe(skillSection);
+      };
+    })();
+
+    (function initModule() {
+      window.initPortfolio = function() {
+        window.initArcReactor();
+        window.initThreeScene();
+        window.initQueryTerminal();
+        window.initScrollFx();
+      };
+      document.addEventListener("DOMContentLoaded", function() {
+        window.initTerminalIntro();
+      });
+    })();
+  </script>
 </body>
 </html>
-
